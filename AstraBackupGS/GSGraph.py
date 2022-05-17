@@ -53,8 +53,8 @@ class GSGraph(QWidget):
 
 
     def update_plot(self, dictionary):
-        self.x_data = np.append(self.x_data, dictionary[self.x_key])
-        self.y_data = np.append(self.y_data, dictionary[self.y_key])
+        self.x_data = np.append(self.x_data, float(dictionary[self.x_key]))
+        self.y_data = np.append(self.y_data, float(dictionary[self.y_key]))
         if self.x_data.size > self.max_points:
             self.x_data = np.delete(self.x_data, 0)
         if self.y_data.size > self.max_points:
