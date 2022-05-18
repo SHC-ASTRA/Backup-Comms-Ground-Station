@@ -32,7 +32,6 @@ class Screen(QWidget):
         self.file_w.received.connect(self.parser.parse)
         self.log_w = CommsLog.CommsLog()
         self.cmds = CommandWidget.CommandWidget({"Halt": "HALT;",
-                                                 "Ignore Jetson": "IGNORE;",
                                                  "Enable Jetson": "ENABLE;",
                                                  "Set Freq 905": "SET_FREQ;905",
                                                  "Set Freq 915": "SET_FREQ;915",
@@ -120,6 +119,8 @@ class Screen(QWidget):
         clear_all_btn.clicked.connect(self.voltage_plot.clear_plot)
         clear_all_btn.clicked.connect(self.left_rpm_plot.clear_plot)
         clear_all_btn.clicked.connect(self.right_rpm_plot.clear_plot)
+        clear_all_btn.clicked.connect(self.snr_plot.clear_plot)
+        clear_all_btn.clicked.connect(self.rssi_plot.clear_plot)
 
         botton_tabwidget = QTabWidget()
         botton_tabwidget.setMinimumWidth(450)
