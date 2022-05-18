@@ -36,9 +36,9 @@ class StateDisplay(QWidget):
         self.jetson_packet_box.setDigitCount(10)
         self.jetson_packet_box.display("00000000")
 
-        layout.addWidget(QLabel("Mode:"), 0, 0)
-        layout.addWidget(QLabel("Hardware Time:"), 1, 0)
-        layout.addWidget(QLabel("Last Jetson Packet:"), 2, 0)
+        layout.addWidget(QLabel(self.mode_key), 0, 0)
+        layout.addWidget(QLabel(self.met_key), 1, 0)
+        layout.addWidget(QLabel(self.jetson_packet_key), 2, 0)
 
         layout.addWidget(self.mode_box, 0, 1)
         layout.addWidget(self.met_box, 1, 1)
@@ -46,8 +46,8 @@ class StateDisplay(QWidget):
 
     def update_state(self, dictionary):
         self.mode_box.setText(dictionary[self.mode_key])
-        self.met_box.display(dictionary[self.met_key].zfill(10))
-        self.jetson_packet_box.display(dictionary[self.jetson_packet_key].zfill(10))
+        self.met_box.display(dictionary[self.met_key])
+        self.jetson_packet_box.display(dictionary[self.jetson_packet_key])
 
 
         # met_time = int(dictionary[self.met_key])

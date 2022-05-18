@@ -55,6 +55,6 @@ class SerialCommsParser(QObject):
                 self.topic_map[topic].emit(results)
             
             except:
-                print(text, "Parse failure\n")
+                print(data, "Parse failure\n")
 
         self.packet.emit(text)

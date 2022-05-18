@@ -31,27 +31,45 @@ class Screen(QWidget):
         self.comm_w.received.connect(self.parser.parse)
         self.file_w.received.connect(self.parser.parse)
         self.log_w = CommsLog.CommsLog()
-        self.cmds = CommandWidget.CommandWidget({"Halt": "HALT",
-                                                 "Ignore Jetson": "IGNORE",
-                                                 "Enable Jetson": "ENABLE",
-                                                 "Set Freq 905": "FREQ,905",
-                                                 "Set Freq 915": "FREQ,915",
-                                                 "Set Freq 925": "FREQ,925"})
+        self.cmds = CommandWidget.CommandWidget({"Halt": "HALT;",
+                                                 "Ignore Jetson": "IGNORE;",
+                                                 "Enable Jetson": "ENABLE;",
+                                                 "Set Freq 905": "SET_FREQ;905",
+                                                 "Set Freq 915": "SET_FREQ;915",
+                                                 "Set Freq 925": "SET_FREQ;925",
+                                                 "Enable Tracking": "TRACKING_ENABLE;",
+                                                 "Disable Tracking": "TRACKING_DISABLE;"})
 
         self.more_cmds = MoreCommandWidget()
 
         self.state_disp = StateDisplay.StateDisplay("mode", "elapsed_time", "last_jetson_packet_time")
         self.parser.packet_data_parsed.connect(self.state_disp.update_state)
 
+        self.gps_disp = StateDisplay.StateDisplay("gps_time", "gs_latitude", "gs_longitude")
+        self.parser.gps_parsed.connect(self.gps_disp.update_state)
+
+        self.rover_gps_disp = StateDisplay.StateDisplay("command_ack", "rover_latitude", "rover_longitude")
+        self.parser.packet_data_parsed.connect(self.rover_gps_disp.update_state)
+
+        self.antenna_tracking_disp = StateDisplay.StateDisplay("active_tracking", "heading_to_rover", "antenna_heading")
+        # TODO: Add another parser for the antenna tracking messages
+
         self.voltage_plot = GSGraph.GSGraph("elapsed_time", "battery_voltage",
-                                            title="Battery Voltage", x_units="Seconds", y_units="Volts")
+                                            title="Battery Voltage", x_units="Milliseconds", y_units="Volts")
         self.parser.packet_data_parsed.connect(self.voltage_plot.update_plot)
         self.left_rpm_plot = GSGraph.GSGraph("elapsed_time", "left_wheels_rpm",
-                                            title="Left Wheels RPM", x_units="Seconds", y_units="RPM")
+                                            title="Left Wheels RPM", x_units="Milliseconds", y_units="RPM")
         self.parser.packet_data_parsed.connect(self.left_rpm_plot.update_plot)
         self.right_rpm_plot = GSGraph.GSGraph("elapsed_time", "right_wheels_rpm",
-                                            title="Right Wheels RPM", x_units="Seconds", y_units="RPM")
+                                            title="Right Wheels RPM", x_units="Milliseconds", y_units="RPM")
         self.parser.packet_data_parsed.connect(self.right_rpm_plot.update_plot)
+
+        self.rssi_plot = GSGraph.GSGraph("gs_time", "rssi",
+                                            title="RSSI", x_units="Milliseconds", y_units="")
+        self.parser.packet_info_parsed.connect(self.rssi_plot.update_plot)
+        self.snr_plot = GSGraph.GSGraph("gs_time", "snr",
+                                            title="SNR", x_units="Milliseconds", y_units="")
+        self.parser.packet_info_parsed.connect(self.snr_plot.update_plot)
 
         if not huntsville:
             lat_min = 32.2345
@@ -82,27 +100,18 @@ class Screen(QWidget):
         primary_graph_holder = QWidget()
         primary_graph_layout = QGridLayout(primary_graph_holder)
         primary_graph_layout.addWidget(self.state_disp, 0, 0)
-        # primary_graph_layout.addWidget(self.model_disp, 0, 1)
-        # primary_graph_layout.addWidget(self.gps_disp, 0, 0)
+        primary_graph_layout.addWidget(self.gps_disp, 0, 1)
+        primary_graph_layout.addWidget(self.rover_gps_disp, 0, 2)
+        primary_graph_layout.addWidget(self.antenna_tracking_disp, 0, 3)
 
         primary_graph_layout.addWidget(self.voltage_plot, 1, 0)
         primary_graph_layout.addWidget(self.left_rpm_plot, 1, 1)
         primary_graph_layout.addWidget(self.right_rpm_plot, 1, 2)
-
-        # secondary_graph_holder = QWidget()
-        # secondary_graph_layout = QGridLayout(secondary_graph_holder)
-        # secondary_graph_layout.addWidget(self.alt_plot2, 0, 0)
-        # secondary_graph_layout.addWidget(self.pressure_plot, 0, 1)
-        # secondary_graph_layout.addWidget(self.temp_plot, 0, 2)
-        # secondary_graph_layout.addWidget(self.volt_plot2, 0, 3)
-        # secondary_graph_layout.addWidget(self.roll_plot, 1, 0)
-        # secondary_graph_layout.addWidget(self.pitch_plot, 1, 1)
-        # secondary_graph_layout.addWidget(self.yaw_plot2, 1, 2)
-        # secondary_graph_layout.addWidget(self.rpm_plot, 1, 3)
+        primary_graph_layout.addWidget(self.rssi_plot, 1, 3)
+        primary_graph_layout.addWidget(self.snr_plot, 1, 4)
 
         top_tabwidget = QTabWidgetResize()
         top_tabwidget.addTab(primary_graph_holder, "Primary Display")
-        # top_tabwidget.addTab(secondary_graph_holder, "Secondary Display")
 
         clear_all_btn = QPushButton("Clear All Graphs")
         clear_all_btn.setParent(top_tabwidget)
