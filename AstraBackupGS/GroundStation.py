@@ -13,6 +13,7 @@ import StateDisplay
 import dark_fusion
 from MoreCommandWidget import MoreCommandWidget
 from QTabWidgetResize import QTabWidgetResize
+import roslibpy
 
 
 huntsville = False
@@ -37,7 +38,9 @@ class Screen(QWidget):
                                                  "Set Freq 915": "SET_FREQ;915",
                                                  "Set Freq 925": "SET_FREQ;925",
                                                  "Enable Tracking": "TRACKING_ENABLE;",
-                                                 "Disable Tracking": "TRACKING_DISABLE;"})
+                                                 "Disable Tracking": "TRACKING_DISABLE;",
+                                                 "Enable Pointing": "POINTING_ENABLE",
+                                                 "Disable Pointing": "POINTING_DISABLE"})
 
         self.more_cmds = MoreCommandWidget()
 
@@ -50,8 +53,8 @@ class Screen(QWidget):
         self.rover_gps_disp = StateDisplay.StateDisplay("command_ack", "rover_latitude", "rover_longitude")
         self.parser.packet_data_parsed.connect(self.rover_gps_disp.update_state)
 
-        self.antenna_tracking_disp = StateDisplay.StateDisplay("active_tracking", "heading_to_rover", "antenna_heading")
-        # TODO: Add another parser for the antenna tracking messages
+        self.antenna_tracking_disp = StateDisplay.StateDisplay("active_tracking", "target_heading", "heading")
+        self.parser.compass_parsed.connect(self.antenna_tracking_disp.update_state)
 
         self.voltage_plot = GSGraph.GSGraph("elapsed_time", "battery_voltage",
                                             title="Battery Voltage", x_units="Milliseconds", y_units="Volts")
@@ -138,6 +141,15 @@ class Screen(QWidget):
 
         layout.addWidget(top_tabwidget)
         layout.addWidget(bottom_layout_holder)
+
+        self.ros = roslibpy.Ros(host="192.168.1.2", port=9090)
+        self.ros.run()
+
+        self.gps_subscriber = roslibpy.Topic(self.ros, "/teensy/gps_native", "sensor_msgs/NavSatFix")
+        def command_manual_gps_target(gps_fix):
+            self.comm_w.transmit(f"MANUAL_GPS_TARGET_LAT;{gps_fix['latitude']}\n")
+            self.comm_w.transmit(f"MANUAL_GPS_TARGET_LON;{gps_fix['longitude']}\n")
+        self.gps_subscriber.subscribe(command_manual_gps_target)
 
 
 def run():

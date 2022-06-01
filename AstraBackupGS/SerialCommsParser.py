@@ -11,6 +11,7 @@ class SerialCommsParser(QObject):
 
     parsed = pyqtSignal(dict)
     gps_parsed = pyqtSignal(dict)
+    compass_parsed = pyqtSignal(dict)
     packet_info_parsed = pyqtSignal(dict)
     packet_data_parsed = pyqtSignal(dict)
     packet = pyqtSignal(str)
@@ -25,7 +26,8 @@ class SerialCommsParser(QObject):
         self.topic_map = {
             "data_packet": self.packet_data_parsed,
             "gps": self.gps_parsed,
-            "packet_info": self.packet_info_parsed
+            "packet_info": self.packet_info_parsed,
+            "compass": self.compass_parsed
         }
 
     def parse(self, text):

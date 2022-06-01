@@ -40,7 +40,7 @@ class MoreCommandWidget(QWidget):
         fin_box.setValidator(QDoubleValidator())
 
         fin_button.clicked.connect(lambda clicked:
-                                   self.send_command(f"SET_ANTENNA_HEADING;{float(fin_box.text()) if fin_box.text() != '' else 0.0 :05.1f}\n"))
+                                   self.send_command(f"MANUAL_HEADING;{float(fin_box.text()) if fin_box.text() != '' else 0.0 :05.1f}\n"))
 
         # state_box = QLineEdit()
         # state_box.setPlaceholderText("State #")
