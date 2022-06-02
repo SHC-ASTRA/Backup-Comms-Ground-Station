@@ -19,6 +19,8 @@ class MoreCommandWidget(QWidget):
 
         # pid_button = QPushButton("Update PID")
         fin_button = QPushButton("Set Antenna Heading")
+        fin_button_1 = QPushButton("Set Base Lon")
+        fin_button_2 = QPushButton("Set Base Lat")
         # state_button = QPushButton("Set State")
         custom_button = QPushButton("Custom Command")
 
@@ -42,6 +44,20 @@ class MoreCommandWidget(QWidget):
         fin_button.clicked.connect(lambda clicked:
                                    self.send_command(f"MANUAL_HEADING;{float(fin_box.text()) if fin_box.text() != '' else 0.0 :05.1f}\n"))
 
+        fin_box_1 = QLineEdit()
+        fin_box_1.setPlaceholderText("Base Longitude")
+        fin_box_1.setValidator(QDoubleValidator())
+
+        fin_button_1.clicked.connect(lambda clicked:
+                                   self.send_command(f"MANUAL_GPS_BASE_LON;{float(fin_box.text()) if fin_box.text() != '' else 0.0 :05.1f}\n"))
+
+        fin_box_2 = QLineEdit()
+        fin_box_2.setPlaceholderText("Base Latitude")
+        fin_box_2.setValidator(QDoubleValidator())
+
+        fin_button_2.clicked.connect(lambda clicked:
+                                   self.send_command(f"MANUAL_GPS_BASE_LAT;{float(fin_box.text()) if fin_box.text() != '' else 0.0 :05.1f}\n"))
+
         # state_box = QLineEdit()
         # state_box.setPlaceholderText("State #")
         # state_box.setValidator(QIntValidator())
@@ -62,6 +78,11 @@ class MoreCommandWidget(QWidget):
 
         layout.addWidget(fin_button, 1, 0)
         layout.addWidget(fin_box, 1, 1, 1, 3)
+
+        layout.addWidget(fin_button_2, 3, 0)
+        layout.addWidget(fin_box_2, 3, 1, 1, 3)
+        layout.addWidget(fin_button_1, 4, 0)
+        layout.addWidget(fin_box_1, 4, 1, 1, 3)
 
         # layout.addWidget(state_button, 2, 0)
         # layout.addWidget(state_box, 2, 1, 1, 3)
